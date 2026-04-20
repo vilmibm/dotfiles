@@ -40,6 +40,7 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'habamax/vim-godot'
 " this thing made lists go wacky:
 "Plug 'preservim/vim-markdown'
 "Plug '~/src/vim-hy'
@@ -141,7 +142,7 @@ imap <C-w>p :tabp<cr>
 vnoremap <C-r> :terminal bash<CR>
 vnoremap <Leader>sg y:spellgood <C-R>"<ENTER>
 
-" Go stuff
+" Go
 nmap <Leader>gr :!go run %<Return>
 nmap <Leader>gt :GoTest<Return>
 nmap <Leader>gi :GoImports<Return>
@@ -150,8 +151,8 @@ nmap <Leader>gR :wa<Return>:GoBuild<Return>:GoRename<Return>
 nmap <C-g> :GoDecls<cr>
 imap <C-g> <esc>:<C-u>GoDecls<cr>
 
-" Autocomplete
-nmap <Leader>gg :YcmCompleter GoToDefinition<Return>
+" Love
+nmap <Leader>lr :!love .<Return>
 
 iab ife if err != nil {<CR>return err<CR>}
 iab ifne if err != nil {<CR>return nil, err<CR>}
@@ -209,6 +210,8 @@ execute "set <FocusLost>=\<Esc>[O"
 let &t_ST = "\e[22;2t"
 let &t_RT = "\e[23;2t"
 
+set termguicolors
+
 " vim hardcodes background color erase even if the terminfo file does
 " not contain bce. This causes incorrect background rendering when
 " using a color theme with a background color in terminals such as
@@ -219,7 +222,7 @@ set t_Co=256
 
 "set background=light
 set background=dark
-colorscheme eva01
+colorscheme shades-of-teal
 
 "colorscheme minimal
 "colorscheme monochrome
@@ -270,6 +273,20 @@ if executable('gopls')
     \     'completeUnimported': v:true,
     \     'matcher': 'fuzzy'
     \   }
+    \ })
+endif
+
+if executable('godot')
+  au User lsp_setup call lsp#register_server({
+    \ 'name': 'godot',
+    \ 'tcp': {server_info->lsp_settings#get('godot', 'tcp', '127.0.0.1:6005')},
+    \ 'root_uri':{server_info->lsp_settings#get('godot', 'root_uri', lsp_settings#root_uri('godot'))},
+    \ 'initialization_options': lsp_settings#get('godot', 'initialization_options', v:null),
+    \ 'allowlist': lsp_settings#get('godot', 'allowlist', ['gdscript3', 'gdscript', 'gd']),
+    \ 'blocklist': lsp_settings#get('godot', 'blocklist', []),
+    \ 'config': lsp_settings#get('godot', 'config', lsp_settings#server_config('godot')),
+    \ 'workspace_config': lsp_settings#get('godot', 'workspace_config', {}),
+    \ 'semantic_highlight': lsp_settings#get('godot', 'semantic_highlight', {}),
     \ })
 endif
 
