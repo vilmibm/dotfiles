@@ -267,7 +267,7 @@ if executable('gopls')
     \   'name': 'gopls',
     \   'cmd': {server_info->['gopls']},
     \   'allowlist': ['go'],
-    \   'root_uri': {server_info->s:root_uri(['go.mod', '.git/'])},
+    "\   'root_uri': {server_info->s:root_uri(['go.mod', '.git/'])},
     \   'initialization_options': {
     \     'diagnostics': v:true,
     \     'completeUnimported': v:true,
