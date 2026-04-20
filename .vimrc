@@ -31,7 +31,6 @@ Plug 'arcticicestudio/nord-vim'
 Plug 'vimwiki/vimwiki'
 Plug 'tpope/vim-fugitive'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'arcticicestudio/nord-vim'
 "Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
 Plug 'rose-pine/vim'
 Plug 'godlygeek/tabular'
@@ -155,6 +154,7 @@ imap <C-g> <esc>:<C-u>GoDecls<cr>
 nmap <Leader>lr :!love .<Return>
 
 iab ife if err != nil {<CR>return err<CR>}
+iab ifp if err != nil {<CR>panic(err)<CR>}
 iab ifne if err != nil {<CR>return nil, err<CR>}
 iab dbg fmt.Printf("DBG %#v\n",
 iab rerf return fmt.Errorf("
@@ -219,19 +219,32 @@ set termguicolors
 let &t_ut=''
 
 set t_Co=256
+set termguicolors
 
-"set background=light
-set background=dark
-colorscheme shades-of-teal
+" some color schemes i have enjoyed
+" eva01
+" apprentice
+" angr
+" Revolution
+" afterglow
+" minimal
+" monochrome
+" true-monochrome
+" nord
+" nordisk
+" SerialExperimentsLain
 
-"colorscheme minimal
-"colorscheme monochrome
-"colorscheme true-monochrome
-"colorscheme arcadia
-"neverness, nefertiti so close
-"colorscheme mourning good but too dark
-"colorscheme Atelier_LakesideDark
-"colorscheme rosepine
+function LightMode()
+  color minimal
+  set bg=light
+endfunction
+
+function DarkMode()
+  color shades-of-teal
+  set bg=dark
+endfunction
+
+call DarkMode()
 
 " experimenting with vim-lsp
 if executable('pylsp')
@@ -254,6 +267,8 @@ endif
 "endif
 
 if executable('ruff')
+    " I tried to point explicitly at a ruff.toml file with `--config` but it
+    " did not work -- really trying to increase line length
     au User lsp_setup call lsp#register_server({
         \ 'name': 'ruff',
         \ 'cmd': {server_info->['ruff', 'server']},
@@ -307,11 +322,17 @@ function! s:on_lsp_buffer_enabled() abort
     nmap <buffer> K <plug>(lsp-hover)
     "nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
     "nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
+    " refer to doc to add more commands
 
     let g:lsp_format_sync_timeout = 1000
     autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
 
-    " refer to doc to add more commands
+    " ruff should not be hovering
+    let l:capabilities = lsp#get_server_capabilities('ruff')
+    if !empty(l:capabilities)
+      let l:capabilities.hoverProvider = v:false
+    endif
+
 endfunction
 
 augroup lsp_install
